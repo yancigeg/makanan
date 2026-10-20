@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Jaringan Meristem &amp; Palisade</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --forest:#1F3D2B;
+  --leaf:#4C7A3D;
+  --leaf-light:#8FB877;
+  --gold:#C9A227;
+  --cream:#F7F5EF;
+  --card:#FFFFFF;
+  --ink:#1C2B1A;
+  --muted:#6B7A6E;
+  --line:#DCE3D6;
+  --danger:#B3402A;
+  --danger-bg:#FBEAE5;
+}
+*{box-sizing:border-box;}
+body{margin:0;}
+.app{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+  padding-bottom:40px;
+}
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+.display{font-family:'Fraunces',Georgia,serif;}
+.topbar{
+  background:var(--forest);
+  color:#EFEAD9;
+  padding:14px 20px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.topbar-inner{
+  max-width:760px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.topbar-title{
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:0.2px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.topbar-title .leaf-ico{font-size:16px;}
+.topbar-meta{
+  display:flex;
+  gap:14px;
+  font-size:13px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.meta-pill{
+  background:rgba(255,255,255,0.1);
+  padding:5px 12px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.timer-pill{
+  background:var(--gold);
+  color:#2B2205;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.timer-pill.warn{
+  background:var(--danger);
+  color:#fff;
+}
+.wrap{
+  max-width:640px;
+  margin:0 auto;
+  padding:28px 20px 0;
+}
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* LANDING */
+.hero{
+  text-align:center;
+  padding:18px 0 8px;
+}
+.hero-badge{
+  display:inline-block;
+  font-size:12px;
+  color:var(--leaf);
+  background:#EAF3E3;
+  border:1px solid #CFE3C2;
+  padding:4px 12px;
+  border-radius:20px;
+  margin-bottom:14px;
+  font-weight:600;
+}
+.hero h1{
+  font-size:28px;
+  line-height:1.25;
+  margin:0 0 10px;
+  color:var(--forest);
+  font-weight:600;
+}
+.hero p{
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.6;
+  margin:0 auto 22px;
+  max-width:480px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:26px 24px;
+  margin-bottom:20px;
+}
+.field{margin-bottom:16px;}
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:var(--forest);
+  margin-bottom:6px;
+}
+.field input, .field select{
+  width:100%;
+  padding:11px 13px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-size:15px;
+  font-family:inherit;
+  color:var(--ink);
+  background:#FCFCFA;
+}
+.field input:focus, .field select:focus{
+  outline:none;
+  border-color:var(--leaf);
+  background:#fff;
+}
+.err{
+  color:var(--danger);
+  font-size:13px;
+  margin-top:6px;
+  display:none;
+}
+.rules{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.7;
+  background:#F2F6EE;
+  border-radius:10px;
+  padding:14px 16px;
+  margin-bottom:18px;
+}
+.rules b{color:var(--forest);}
+.btn{
+  width:100%;
+  padding:13px;
+  border-radius:8px;
+  border:none;
+  font-size:15px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  transition:transform .08s ease, background .15s ease;
+}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:var(--leaf);color:#fff;}
+.btn-primary:hover{background:var(--forest);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-size:13px;padding:9px;}
+.btn-ghost:hover{background:#F2F0E8;}
+.locked-box{
+  text-align:center;
+  padding:30px 10px;
+}
+.locked-box .ico{font-size:34px;margin-bottom:10px;}
+.locked-box h3{color:var(--forest);margin:0 0 8px;font-size:19px;}
+.locked-box p{color:var(--muted);font-size:14px;line-height:1.6;}
+.score-recap{
+  display:flex;
+  justify-content:center;
+  gap:26px;
+  margin:18px 0 4px;
+}
+.score-recap div{text-align:center;}
+.score-recap .num{font-size:26px;font-weight:700;color:var(--forest);font-family:'Fraunces',serif;}
+.score-recap .lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* QUIZ */
+.progress-bar{
+  height:6px;
+  background:var(--line);
+  border-radius:6px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+.progress-fill{
+  height:100%;
+  background:var(--leaf);
+  width:5%;
+  transition:width .25s ease;
+}
+.q-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+.q-tag{
+  background:#EAF3E3;
+  color:var(--leaf);
+  padding:3px 10px;
+  border-radius:20px;
+  font-weight:600;
+  font-size:12px;
+}
+.q-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+}
+.q-stem{
+  font-size:15.5px;
+  line-height:1.65;
+  margin-bottom:14px;
+  color:var(--ink);
+}
+.data-table{
+  width:100%;
+  border-collapse:collapse;
+  margin:12px 0 16px;
+  font-size:13.5px;
+}
+.data-table th, .data-table td{
+  border:1px solid var(--line);
+  padding:7px 10px;
+  text-align:center;
+}
+.data-table th{
+  background:#F0F5EA;
+  color:var(--forest);
+  font-weight:600;
+}
+.options{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:6px;
+}
+.opt{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  cursor:pointer;
+  transition:border-color .12s ease, background .12s ease;
+  background:#FCFCFA;
+}
+.opt:hover{border-color:var(--leaf-light);background:#F6FAF3;}
+.opt.selected{
+  border-color:var(--leaf);
+  background:#EAF3E3;
+}
+.opt .badge{
+  flex:none;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:#fff;
+  border:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--muted);
+}
+.opt.selected .badge{
+  background:var(--leaf);
+  border-color:var(--leaf);
+  color:#fff;
+}
+.opt .txt{font-size:14.5px;line-height:1.55;padding-top:2px;}
+.nav-row{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+.nav-row .btn{flex:1;}
+.btn-secondary{background:#fff;color:var(--forest);border:1px solid var(--line);}
+.btn-secondary:hover{background:#F2F0E8;}
+.dots{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:18px 0 4px;
+  justify-content:center;
+}
+.dot{
+  width:24px;height:24px;
+  border-radius:6px;
+  border:1px solid var(--line);
+  font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);
+  cursor:pointer;
+  background:#fff;
+}
+.dot.answered{background:#EAF3E3;border-color:var(--leaf-light);color:var(--leaf);}
+.dot.current{border-color:var(--forest);border-width:2px;color:var(--forest);font-weight:700;}
+
+/* RESULT */
+.result-card{
+  text-align:center;
+  padding:34px 24px;
+}
+.result-card .ring{
+  width:120px;height:120px;
+  border-radius:50%;
+  margin:0 auto 18px;
+  display:flex;align-items:center;justify-content:center;
+  border:8px solid #EAF3E3;
+  position:relative;
+}
+.result-card .ring .val{font-size:28px;font-weight:700;color:var(--forest);font-family:'Fraunces',serif;}
+.result-card h2{margin:0 0 6px;color:var(--forest);font-size:20px;}
+.result-card p{color:var(--muted);font-size:14px;margin:0 0 20px;}
+.stat-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-bottom:22px;
+}
+.stat-box{
+  background:#F7F5EF;
+  border-radius:10px;
+  padding:12px 6px;
+}
+.stat-box .n{font-size:19px;font-weight:700;color:var(--forest);}
+.stat-box .l{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* TEACHER PANEL */
+.teacher-link{
+  text-align:center;
+  margin-top:26px;
+  font-size:12px;
+  color:var(--muted);
+}
+.teacher-link a{color:var(--leaf);cursor:pointer;text-decoration:underline;}
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(20,30,20,0.5);
+  z-index:50;
+  align-items:flex-start;
+  justify-content:center;
+  padding:40px 16px;
+  overflow-y:auto;
+}
+.overlay.active{display:flex;}
+.panel{
+  background:#fff;
+  border-radius:14px;
+  max-width:680px;
+  width:100%;
+  padding:26px;
+}
+.panel h3{margin:0 0 4px;color:var(--forest);}
+.panel .sub{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.panel table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:16px;}
+.panel th, .panel td{border:1px solid var(--line);padding:6px 8px;text-align:left;}
+.panel th{background:#F0F5EA;color:var(--forest);}
+.panel-actions{display:flex;gap:10px;}
+.panel-actions .btn{flex:1;}
+.close-x{
+  float:right;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:14px;
+  background:#F2F0E8;
+  border:none;
+  border-radius:6px;
+  padding:5px 9px;
+}
+.empty-note{font-size:13px;color:var(--muted);text-align:center;padding:20px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-title"><span class="leaf-ico">&#127807;</span> Kuis Jaringan Meristem &amp; Palisade</div>
+      <div class="topbar-meta" id="topbarMeta"></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- LANDING -->
+    <div class="screen active" id="screenLanding">
+      <div class="hero">
+        <span class="hero-badge">Setara soal OSN &middot; Literasi &amp; numerasi</span>
+        <h1 class="display">Ujian Biologi Kelas XI<br>Jaringan Meristem &amp; Palisade</h1>
+        <p>20 soal pilihan ganda (5 opsi) yang menguji kemampuanmu membaca data, grafik, dan tabel terkait jaringan meristem dan jaringan palisade. Kerjakan dengan cermat &mdash; setiap siswa hanya berkesempatan mengikuti kuis ini <b>satu kali</b>.</p>
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <label for="inpNama">Nama lengkap</label>
+          <input type="text" id="inpNama" placeholder="Tulis nama lengkapmu">
+          <div class="err" id="errNama">Nama wajib diisi.</div>
+        </div>
+        <div class="field">
+          <label for="inpKelas">Kelas</label>
+          <input type="text" id="inpKelas" placeholder="Contoh: XI IPA 2">
+          <div class="err" id="errKelas">Kelas wajib diisi.</div>
+        </div>
+
+        <div class="rules">
+          <b>Sebelum mulai:</b><br>
+          &bull; Waktu ujian <b>40 menit</b>, berjalan otomatis dan tidak dapat dijeda.<br>
+          &bull; Kuis otomatis dikumpulkan saat waktu habis.<br>
+          &bull; Setiap kombinasi nama &amp; kelas hanya dapat mengerjakan <b>1 kali</b>.<br>
+          &bull; Pastikan nama dan kelas ditulis dengan benar sebelum memulai.
+        </div>
+
+        <button class="btn btn-primary" id="btnMulai">Mulai ujian</button>
+      </div>
+
+      <div class="teacher-link"><a id="openTeacher">Panel guru</a></div>
+    </div>
+
+    <!-- LOCKED (sudah pernah mengikuti) -->
+    <div class="screen" id="screenLocked">
+      <div class="card locked-box">
+        <div class="ico">&#128274;</div>
+        <h3>Kamu sudah mengikuti kuis ini</h3>
+        <p id="lockedText">Setiap siswa hanya berhak mengikuti kuis ini satu kali. Hasil sebelumnya sudah tercatat.</p>
+        <div class="score-recap" id="lockedRecap"></div>
+        <button class="btn btn-ghost" id="btnBackLanding" style="margin-top:18px;">Kembali</button>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="screen" id="screenQuiz">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="q-meta">
+        <span class="q-tag" id="qTag">Soal 1 dari 20</span>
+        <span id="qAnsweredCount">0 terjawab</span>
+      </div>
+      <div class="q-card">
+        <div class="q-stem" id="qStem"></div>
+        <div id="qTableWrap"></div>
+        <div class="options" id="qOptions"></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-secondary" id="btnPrev">Sebelumnya</button>
+        <button class="btn btn-primary" id="btnNext">Selanjutnya</button>
+      </div>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="screen" id="screenResult">
+      <div class="card result-card">
+        <div class="ring"><div class="val" id="resultScore">0</div></div>
+        <h2>Ujian selesai</h2>
+        <p id="resultSub">Terima kasih sudah mengerjakan dengan sungguh-sungguh.</p>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="n" id="statBenar">0</div><div class="l">Benar</div></div>
+          <div class="stat-box"><div class="n" id="statSalah">0</div><div class="l">Salah</div></div>
+          <div class="stat-box"><div class="n" id="statWaktu">0:00</div><div class="l">Waktu</div></div>
+        </div>
+        <div class="rules" style="text-align:left;">
+          Kunci jawaban dan pembahasan detail akan dibagikan oleh guru secara terpisah setelah seluruh siswa selesai mengerjakan.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TEACHER PANEL -->
+  <div class="overlay" id="teacherOverlay">
+    <div class="panel">
+      <button class="close-x" id="closeTeacher">Tutup</button>
+      <h3>Panel guru</h3>
+      <div class="sub" id="teacherSub">Masukkan kata sandi untuk melihat rekap hasil siswa.</div>
+
+      <div id="teacherAuth">
+        <div class="field">
+          <label for="teacherPass">Kata sandi guru</label>
+          <input type="password" id="teacherPass" placeholder="Kata sandi">
+          <div class="err" id="errPass">Kata sandi salah.</div>
+        </div>
+        <button class="btn btn-primary" id="btnLoginTeacher">Masuk</button>
+      </div>
+
+      <div id="teacherData" style="display:none;">
+        <div id="teacherTableWrap"></div>
+        <div class="panel-actions">
+          <button class="btn btn-secondary" id="btnRefreshData">Muat ulang data</button>
+          <button class="btn btn-primary" id="btnExportExcel">Unduh rekap Excel</button>
+        </div>
+        <div class="rules" style="margin-top:16px;">
+          Catatan: data hasil siswa disimpan bersama (shared) di penyimpanan kuis ini sehingga dapat diakses dari perangkat mana pun yang membuka kuis ini. Gunakan kata sandi guru dengan bijak.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TEACHER_PASSWORD = "guru2026";
+const EXAM_DURATION_SECONDS = 40 * 60;
+
+const questions = [
+{
+  stem: "Data pertumbuhan meristem apikal akar kecambah jagung diukur setiap hari selama 5 hari:",
+  table: [["Hari ke-", "0", "1", "2", "3", "4", "5"], ["Panjang akar (cm)", "2,0", "3,2", "4,9", "7,1", "9,8", "13,0"]],
+  question: "Berapa laju pertumbuhan rata-rata (cm/hari) akar tersebut selama 5 hari, dan pada rentang hari keberapa laju pertumbuhan hariannya paling tinggi?",
+  options: [
+    "2,2 cm/hari; tertinggi pada hari ke-4 sampai ke-5",
+    "2,2 cm/hari; tertinggi pada hari ke-1 sampai ke-2",
+    "1,8 cm/hari; tertinggi pada hari ke-3 sampai ke-4",
+    "2,2 cm/hari; tertinggi pada hari ke-3 sampai ke-4",
+    "1,8 cm/hari; tertinggi pada hari ke-4 sampai ke-5"
+  ],
+  correct: 0
+},
+{
+  stem: "Pengamatan preparat akar bawang merah (Allium cepa) pada zona meristematik menunjukkan dari 400 sel yang diamati, 24 sel sedang mengalami pembelahan (profase, metafase, anafase, atau telofase).",
+  table: null,
+  question: "Berapakah indeks mitosis (IM) preparat tersebut?",
+  options: ["4%", "6%", "8%", "10%", "12%"],
+  correct: 1
+},
+{
+  stem: "Total waktu siklus sel pada zona meristem akar adalah 24 jam, dengan komposisi: Interfase 90%, Profase 6%, Metafase 2%, Anafase 1%, Telofase 1%.",
+  table: null,
+  question: "Berapa lama (dalam jam) sel berada pada fase profase?",
+  options: ["1,44 jam", "2,16 jam", "0,24 jam", "1,2 jam", "0,96 jam"],
+  correct: 0
+},
+{
+  stem: "Data ketebalan jaringan palisade pada dua jenis daun dari spesies yang sama:",
+  table: [["Jenis daun", "Ketebalan palisade", "Jumlah lapisan sel"], ["Sun leaf (terbuka)", "120 \u00b5m", "2 lapis"], ["Shade leaf (ternaungi)", "60 \u00b5m", "1 lapis"]],
+  question: "Berapa rasio ketebalan palisade sun leaf terhadap shade leaf, dan apa penjelasan biologis paling tepat?",
+  options: [
+    "2:1; sun leaf memiliki lebih banyak lapisan sel palisade untuk memaksimalkan penangkapan cahaya matahari yang intens",
+    "1:2; shade leaf beradaptasi mengurangi jaringan palisade karena cahaya rendah",
+    "2:1; shade leaf memerlukan lebih sedikit air sehingga palisade menipis",
+    "1:1; ketebalan palisade tidak dipengaruhi cahaya",
+    "3:1; sun leaf mengalami etiolasi"
+  ],
+  correct: 0
+},
+{
+  stem: "Grafik laju fotosintesis jaringan palisade (\u00b5mol O\u2082/m\u00b2/s) terhadap intensitas cahaya:",
+  table: [["Intensitas cahaya (klux)", "0", "5", "10", "15", "20", "25"], ["Laju fotosintesis", "0", "8", "15", "20", "22", "22"]],
+  question: "Pada intensitas cahaya berapa laju fotosintesis mulai mencapai titik saturasi (konstan)?",
+  options: ["5 klux", "10 klux", "15 klux", "20 klux", "25 klux"],
+  correct: 3
+},
+{
+  stem: "Sebuah eksperimen kultur jaringan menggunakan eksplan dari jaringan meristem ujung batang (100 eksplan) menghasilkan 78 kalus yang tumbuh sempurna.",
+  table: null,
+  question: "Berapa persentase keberhasilan induksi kalus, dan mengapa jaringan meristem dipilih sebagai sumber eksplan?",
+  options: [
+    "78%; karena sel meristem bersifat aktif membelah namun sudah terdiferensiasi sempurna",
+    "78%; karena sel meristem bersifat totipotensi tinggi dan aktif membelah (belum terdiferensiasi)",
+    "22%; karena sel meristem sulit membelah",
+    "78%; karena sel meristem mengandung banyak kloroplas",
+    "22%; karena sel meristem bersifat totipotensi rendah"
+  ],
+  correct: 1
+},
+{
+  stem: "Pengamatan mikroskop menunjukkan luas bidang pandang 0,4 mm\u00b2 memuat 32 sel palisade.",
+  table: null,
+  question: "Berapa perkiraan jumlah sel palisade per mm\u00b2 permukaan daun tersebut?",
+  options: ["8 sel/mm\u00b2", "32 sel/mm\u00b2", "80 sel/mm\u00b2", "128 sel/mm\u00b2", "160 sel/mm\u00b2"],
+  correct: 2
+},
+{
+  stem: "Data lebar lingkaran tahun batang pohon (hasil aktivitas kambium vaskuler/meristem lateral):",
+  table: [["Tahun", "2019", "2020", "2021", "2022", "2023"], ["Lebar lingkaran (mm)", "3", "5", "2", "6", "4"]],
+  question: "Jika tahun 2021 tercatat memiliki curah hujan paling rendah dalam 5 tahun terakhir, hubungan apa yang paling tepat ditunjukkan data ini?",
+  options: [
+    "Aktivitas kambium vaskuler meningkat saat curah hujan rendah, terlihat dari lingkaran tahun 2021 yang paling lebar",
+    "Aktivitas kambium vaskuler menurun saat curah hujan rendah, terlihat dari lingkaran tahun 2021 yang paling sempit",
+    "Curah hujan tidak memengaruhi aktivitas meristem lateral",
+    "Lingkaran tahun terbentuk oleh aktivitas jaringan palisade, bukan kambium",
+    "Lingkaran tahun yang sempit pada 2021 menunjukkan bahwa musim kemarau tidak berpengaruh pada meristem"
+  ],
+  correct: 1
+},
+{
+  stem: "Pertambahan panjang ruas (internodus) batang rumput diukur pada 3 titik berbeda dalam satu hari:",
+  table: [["Titik pengukuran", "Dekat buku bawah", "Tengah ruas", "Dekat buku atas"], ["Pertambahan panjang", "1,5 cm", "0,3 cm", "0,2 cm"]],
+  question: "Berdasarkan data ini, di manakah kemungkinan besar letak meristem interkalar pada batang rumput tersebut?",
+  options: [
+    "Dekat buku bawah, karena pertambahan panjang paling besar terjadi di sana \u2014 ciri khas meristem interkalar pada famili Graminae",
+    "Tengah ruas, karena letak paling jauh dari akar",
+    "Dekat buku atas, karena paling dekat pucuk",
+    "Merata di seluruh ruas karena seluruh sel batang bersifat meristematik",
+    "Tidak dapat ditentukan dari data pertambahan panjang"
+  ],
+  correct: 0
+},
+{
+  stem: "Percobaan pemberian auksin (IAA) pada potongan koleoptil dengan berbagai konsentrasi:",
+  table: [["Konsentrasi IAA (ppm)", "0", "1", "5", "10", "20"], ["Pertambahan panjang 24 jam (mm)", "2", "5", "9", "6", "2"]],
+  question: "Berapa konsentrasi IAA yang optimum untuk pemanjangan sel, dan apa yang ditunjukkan pola grafiknya?",
+  options: [
+    "10 ppm; auksin memacu pertumbuhan secara linear tanpa batas",
+    "5 ppm; peningkatan konsentrasi lebih lanjut justru menghambat pertumbuhan (efek superoptimal)",
+    "20 ppm; semakin tinggi konsentrasi semakin baik untuk pertumbuhan",
+    "1 ppm; auksin hanya efektif pada konsentrasi rendah",
+    "0 ppm; auksin tidak berpengaruh pada pertumbuhan koleoptil"
+  ],
+  correct: 1
+},
+{
+  stem: "Data ketebalan kutikula, jumlah lapisan palisade, dan laju transpirasi (mg H\u2082O/dm\u00b2/jam) pada tiga jenis daun:",
+  table: [["Jenis daun", "Kutikula", "Lapisan palisade", "Laju transpirasi"], ["A (xerofit)", "Tebal", "3 lapis", "12"], ["B (mesofit)", "Sedang", "2 lapis", "25"], ["C (higrofit)", "Tipis", "1 lapis", "48"]],
+  question: "Hubungan yang paling tepat antara ketebalan kutikula/palisade dan laju transpirasi berdasarkan data adalah:",
+  options: [
+    "Semakin tebal kutikula dan semakin banyak lapisan palisade, semakin tinggi laju transpirasi",
+    "Semakin tebal kutikula dan semakin banyak lapisan palisade, semakin rendah laju transpirasi karena mengurangi kehilangan air",
+    "Ketebalan palisade tidak berkaitan dengan laju transpirasi",
+    "Laju transpirasi hanya dipengaruhi oleh jumlah stomata, bukan palisade",
+    "Daun higrofit memiliki transpirasi rendah karena palisade yang tebal"
+  ],
+  correct: 1
+},
+{
+  stem: "Data diameter batang pohon jati selama 6 tahun (hasil pertumbuhan sekunder kambium/meristem lateral):",
+  table: [["Tahun", "2018", "2019", "2020", "2021", "2022", "2023"], ["Diameter (cm)", "10,0", "12,4", "14,6", "16,5", "18,1", "19,4"]],
+  question: "Jika pola perlambatan pertambahan diameter (selisih antar tahun terus mengecil) berlanjut seperti tren 2019\u20132023, berapa perkiraan diameter batang pada tahun 2024?",
+  options: ["20,4 cm", "21,0 cm", "19,7 cm", "20,7 cm", "22,0 cm"],
+  correct: 0
+},
+{
+  stem: "Sel-sel pada zona meristem apikal akar membelah secara mitosis setiap 20 jam (waktu generasi). Pada t = 0 terdapat 50 sel meristematik aktif.",
+  table: null,
+  question: "Berapa perkiraan jumlah sel setelah 60 jam, jika diasumsikan seluruh sel membelah serentak setiap generasi?",
+  options: ["100 sel", "150 sel", "200 sel", "400 sel", "800 sel"],
+  correct: 3
+},
+{
+  stem: "Data jumlah kloroplas rata-rata per sel palisade pada daun yang diadaptasi selama beberapa minggu pada berbagai intensitas cahaya:",
+  table: [["Intensitas cahaya", "Rendah (2 klux)", "Sedang (10 klux)", "Tinggi (25 klux)"], ["Rata-rata kloroplas/sel", "15", "32", "48"]],
+  question: "Kesimpulan paling tepat yang dapat ditarik dari data tersebut adalah:",
+  options: [
+    "Jumlah kloroplas per sel palisade berbanding lurus dengan intensitas cahaya sebagai bentuk adaptasi mengoptimalkan fotosintesis",
+    "Jumlah kloroplas berbanding terbalik dengan intensitas cahaya",
+    "Intensitas cahaya tidak berkaitan dengan jumlah kloroplas",
+    "Jumlah kloroplas tetap konstan pada berbagai intensitas cahaya",
+    "Kloroplas hanya ditemukan pada daun yang ternaungi"
+  ],
+  correct: 0
+},
+{
+  stem: "Preparat akar bawang merah direndam dalam larutan kolkisin (menghambat pembentukan benang spindel). Dari 300 sel yang diamati: Interfase 210, Profase 60, Metafase 25, Anafase 3, Telofase 2.",
+  table: null,
+  question: "Berapa indeks mitosis preparat tersebut, dan pada fase manakah sel-sel tampak menumpuk akibat pengaruh kolkisin?",
+  options: [
+    "IM = 30%; sel menumpuk di metafase karena kromosom gagal berpisah akibat benang spindel terhambat",
+    "IM = 90%; sel menumpuk di anafase",
+    "IM = 30%; sel menumpuk di interfase",
+    "IM = 70%; sel menumpuk di profase",
+    "IM = 30%; kolkisin tidak berpengaruh pada mitosis"
+  ],
+  correct: 0
+},
+{
+  stem: "Data laju fotosintesis bersih jaringan palisade (unit) pada berbagai suhu:",
+  table: [["Suhu (\u00b0C)", "15", "25", "35", "45"], ["Fotosintesis bersih", "10", "18", "20", "6"]],
+  question: "Berapa suhu optimum untuk aktivitas fotosintesis jaringan palisade berdasarkan data, dan apa penyebab penurunan drastis pada 45\u00b0C?",
+  options: [
+    "35\u00b0C; penurunan disebabkan denaturasi enzim fotosintesis pada suhu tinggi",
+    "45\u00b0C; suhu tinggi selalu meningkatkan laju enzimatis",
+    "15\u00b0C; suhu rendah optimum untuk enzim",
+    "25\u00b0C; tidak ada penjelasan penurunan di 45\u00b0C",
+    "35\u00b0C; penurunan disebabkan kekurangan CO\u2082"
+  ],
+  correct: 0
+},
+{
+  stem: "Data persentase ketebalan jaringan palisade terhadap total ketebalan mesofil daun pada empat spesies dari habitat berbeda:",
+  table: [["Spesies", "Habitat", "Persentase palisade"], ["P", "Xerofit (gurun)", "65%"], ["Q", "Mesofit (dataran rendah)", "45%"], ["R", "Higrofit (rawa)", "20%"], ["S", "Hidrofit (terapung)", "5%"]],
+  question: "Kecenderungan yang ditunjukkan data ini adalah:",
+  options: [
+    "Semakin kering habitat suatu tumbuhan, semakin besar proporsi jaringan palisade untuk memaksimalkan efisiensi fotosintesis dan penggunaan air",
+    "Semakin basah habitat, semakin besar proporsi jaringan palisade",
+    "Proporsi jaringan palisade tidak berkaitan dengan habitat",
+    "Tumbuhan hidrofit memiliki palisade paling tebal karena banyak air tersedia",
+    "Semakin kering habitat, semakin sedikit palisade karena keterbatasan air"
+  ],
+  correct: 0
+},
+{
+  stem: "Waktu siklus sel pada meristem apikal pucuk adalah 18 jam, dengan fase S (sintesis DNA) 40%, G2 15%, dan M (mitosis) 10% dari total siklus.",
+  table: null,
+  question: "Berapa lama fase G1 berlangsung?",
+  options: ["6,3 jam", "7,2 jam", "5,4 jam", "4,5 jam", "8,1 jam"],
+  correct: 0
+},
+{
+  stem: "Pertambahan tinggi tanaman kecambah (didominasi aktivitas meristem apikal pucuk) diukur setiap 2 hari selama 10 hari:",
+  table: [["Hari ke-", "0", "2", "4", "6", "8", "10"], ["Tinggi (cm)", "0", "1,5", "4", "8", "9,5", "10"]],
+  question: "Fase pertumbuhan tercepat (fase logaritmik) terjadi pada rentang hari ke berapa, dilihat dari kenaikan tertinggi antar interval?",
+  options: ["Hari ke-0 sampai ke-2", "Hari ke-2 sampai ke-4", "Hari ke-4 sampai ke-6", "Hari ke-6 sampai ke-8", "Hari ke-8 sampai ke-10"],
+  correct: 2
+},
+{
+  stem: "Berdasarkan data pertumbuhan tinggi tanaman pada soal sebelumnya (hari ke-0 hingga ke-10), pola kenaikan tinggi melambat drastis pada hari ke-8 sampai ke-10.",
+  table: null,
+  question: "Tipe kurva pertumbuhan yang terbentuk dari keseluruhan data tersebut, dan fase apa yang terjadi pada hari ke-8\u201310?",
+  options: [
+    "Kurva sigmoid; fase stasioner/penuaan (senescence) karena aktivitas meristem menurun",
+    "Kurva linear; fase logaritmik masih berlanjut",
+    "Kurva eksponensial murni; tidak ada fase perlambatan",
+    "Kurva sigmoid; fase ini justru merupakan fase paling cepat",
+    "Data tidak membentuk pola tertentu"
+  ],
+  correct: 0
+}
+];
+
+let student = { nama: "", kelas: "", key: "" };
+let answers = new Array(questions.length).fill(-1);
+let currentQ = 0;
+let timeLeft = EXAM_DURATION_SECONDS;
+let timerInterval = null;
+let startTimestamp = null;
+
+function slugKey(nama, kelas){
+  return (nama.trim() + "_" + kelas.trim()).toLowerCase().replace(/\s+/g,"-").replace(/[^a-z0-9\-]/g,"");
+}
+function fmtTime(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return m + ":" + String(s).padStart(2,"0");
+}
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function updateTopbar(){
+  const meta = document.getElementById("topbarMeta");
+  if(!student.nama){ meta.innerHTML = ""; return; }
+  let timerHtml = "";
+  if(document.getElementById("screenQuiz").classList.contains("active")){
+    const warn = timeLeft <= 300;
+    timerHtml = '<span class="meta-pill timer-pill' + (warn ? ' warn' : '') + '" id="timerPill">' + fmtTime(timeLeft) + '</span>';
+  }
+  meta.innerHTML =
+    '<span class="meta-pill">' + student.nama + '</span>' +
+    '<span class="meta-pill">' + student.kelas + '</span>' +
+    timerHtml;
+}
+
+/* ---------- LANDING ---------- */
+document.getElementById("btnMulai").addEventListener("click", async ()=>{
+  const nama = document.getElementById("inpNama").value.trim();
+  const kelas = document.getElementById("inpKelas").value.trim();
+  document.getElementById("errNama").style.display = nama ? "none" : "block";
+  document.getElementById("errKelas").style.display = kelas ? "none" : "block";
+  if(!nama || !kelas) return;
+
+  student.nama = nama;
+  student.kelas = kelas;
+  student.key = slugKey(nama, kelas);
+
+  const btn = document.getElementById("btnMulai");
+  btn.disabled = true;
+  btn.textContent = "Memeriksa data...";
+
+  try{
+    const existing = await window.storage.get("attempt:" + student.key, true);
+    if(existing){
+      const data = JSON.parse(existing.value);
+      showLocked(data);
+      btn.disabled = false;
+      btn.textContent = "Mulai ujian";
+      return;
+    }
+  }catch(e){
+    /* belum pernah mengikuti - lanjutkan */
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Mulai ujian";
+  startQuiz();
+});
+
+function showLocked(data){
+  document.getElementById("lockedText").textContent =
+    "Kamu (" + student.nama + " - " + student.kelas + ") sudah mengumpulkan kuis ini sebelumnya. Setiap siswa hanya berhak mengikuti kuis ini satu kali.";
+  document.getElementById("lockedRecap").innerHTML =
+    '<div><div class="num">' + data.skor + '</div><div class="lbl">Skor</div></div>' +
+    '<div><div class="num">' + data.benar + '</div><div class="lbl">Benar</div></div>' +
+    '<div><div class="num">' + data.salah + '</div><div class="lbl">Salah</div></div>';
+  showScreen("screenLocked");
+  updateTopbar();
+}
+document.getElementById("btnBackLanding").addEventListener("click", ()=>{
+  showScreen("screenLanding");
+  student = { nama:"", kelas:"", key:"" };
+  updateTopbar();
+});
+
+/* ---------- QUIZ ---------- */
+function startQuiz(){
+  currentQ = 0;
+  answers = new Array(questions.length).fill(-1);
+  timeLeft = EXAM_DURATION_SECONDS;
+  startTimestamp = Date.now();
+  showScreen("screenQuiz");
+  renderQuestion();
+  renderDots();
+  updateTopbar();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft <= 0){
+      timeLeft = 0;
+      updateTopbar();
+      clearInterval(timerInterval);
+      finishQuiz();
+      return;
+    }
+    updateTopbar();
+  }, 1000);
+}
+
+function renderQuestion(){
+  const q = questions[currentQ];
+  document.getElementById("qTag").textContent = "Soal " + (currentQ+1) + " dari " + questions.length;
+  const answeredCount = answers.filter(a=>a>=0).length;
+  document.getElementById("qAnsweredCount").textContent = answeredCount + " terjawab";
+  document.getElementById("progressFill").style.width = (((currentQ+1)/questions.length)*100) + "%";
+
+  document.getElementById("qStem").textContent = q.stem;
+
+  const tableWrap = document.getElementById("qTableWrap");
+  if(q.table){
+    let html = "<table class='data-table'><thead><tr>";
+    q.table[0].forEach(h=>html += "<th>"+h+"</th>");
+    html += "</tr></thead><tbody>";
+    for(let r=1;r<q.table.length;r++){
+      html += "<tr>";
+      q.table[r].forEach(c=>html += "<td>"+c+"</td>");
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+    tableWrap.innerHTML = html;
+  } else {
+    tableWrap.innerHTML = "";
+  }
+
+  const questionLine = document.createElement("div");
+  questionLine.style.fontWeight = "600";
+  questionLine.style.margin = "4px 0 12px";
+  questionLine.style.color = "var(--forest)";
+  questionLine.textContent = q.question;
+  tableWrap.appendChild(questionLine);
+
+  const letters = ["A","B","C","D","E"];
+  const optWrap = document.getElementById("qOptions");
+  optWrap.innerHTML = "";
+  q.options.forEach((opt, idx)=>{
+    const div = document.createElement("div");
+    div.className = "opt" + (answers[currentQ]===idx ? " selected" : "");
+    div.innerHTML = '<span class="badge">'+letters[idx]+'</span><span class="txt">'+opt+'</span>';
+    div.addEventListener("click", ()=>{
+      answers[currentQ] = idx;
+      renderQuestion();
+      renderDots();
+    });
+    optWrap.appendChild(div);
+  });
+
+  document.getElementById("btnPrev").style.visibility = currentQ===0 ? "hidden" : "visible";
+  document.getElementById("btnNext").textContent = currentQ === questions.length-1 ? "Kumpulkan ujian" : "Selanjutnya";
+}
+
+function renderDots(){
+  const wrap = document.getElementById("dots");
+  wrap.innerHTML = "";
+  questions.forEach((q,i)=>{
+    const d = document.createElement("div");
+    d.className = "dot" + (answers[i]>=0 ? " answered" : "") + (i===currentQ ? " current" : "");
+    d.textContent = i+1;
+    d.addEventListener("click", ()=>{ currentQ = i; renderQuestion(); renderDots(); });
+    wrap.appendChild(d);
+  });
+}
+
+document.getElementById("btnPrev").addEventListener("click", ()=>{
+  if(currentQ>0){ currentQ--; renderQuestion(); renderDots(); }
+});
+document.getElementById("btnNext").addEventListener("click", ()=>{
+  if(currentQ < questions.length-1){
+    currentQ++;
+    renderQuestion();
+    renderDots();
+  } else {
+    const unanswered = answers.filter(a=>a<0).length;
+    if(unanswered > 0){
+      const ok = confirm("Masih ada " + unanswered + " soal belum dijawab. Tetap kumpulkan ujian?");
+      if(!ok) return;
+    }
+    finishQuiz();
+  }
+});
+
+async function finishQuiz(){
+  clearInterval(timerInterval);
+  let benar = 0;
+  questions.forEach((q,i)=>{ if(answers[i]===q.correct) benar++; });
+  const salah = questions.length - benar;
+  const skor = Math.round((benar/questions.length)*100);
+  const durasiDetik = EXAM_DURATION_SECONDS - timeLeft;
+
+  const record = {
+    nama: student.nama,
+    kelas: student.kelas,
+    skor: skor,
+    benar: benar,
+    salah: salah,
+    waktuMulai: new Date(startTimestamp).toLocaleString("id-ID"),
+    durasi: fmtTime(durasiDetik)
+  };
+
+  try{
+    await window.storage.set("attempt:" + student.key, JSON.stringify(record), true);
+    await window.storage.set("results:" + student.key, JSON.stringify(record), true);
+  }catch(e){
+    console.error("Gagal menyimpan hasil:", e);
+  }
+
+  document.getElementById("resultScore").textContent = skor;
+  document.getElementById("statBenar").textContent = benar;
+  document.getElementById("statSalah").textContent = salah;
+  document.getElementById("statWaktu").textContent = fmtTime(durasiDetik);
+  document.getElementById("resultSub").textContent =
+    student.nama + " (" + student.kelas + ") \u2014 hasil telah dikirim ke guru.";
+  showScreen("screenResult");
+  updateTopbar();
+}
+
+/* ---------- TEACHER PANEL ---------- */
+document.getElementById("openTeacher").addEventListener("click", ()=>{
+  document.getElementById("teacherOverlay").classList.add("active");
+});
+document.getElementById("closeTeacher").addEventListener("click", ()=>{
+  document.getElementById("teacherOverlay").classList.remove("active");
+});
+document.getElementById("btnLoginTeacher").addEventListener("click", ()=>{
+  const val = document.getElementById("teacherPass").value;
+  if(val === TEACHER_PASSWORD){
+    document.getElementById("errPass").style.display = "none";
+    document.getElementById("teacherAuth").style.display = "none";
+    document.getElementById("teacherData").style.display = "block";
+    document.getElementById("teacherSub").textContent = "Rekap hasil seluruh siswa yang telah mengikuti kuis.";
+    loadTeacherData();
+  } else {
+    document.getElementById("errPass").style.display = "block";
+  }
+});
+
+let lastResults = [];
+async function loadTeacherData(){
+  const wrap = document.getElementById("teacherTableWrap");
+  wrap.innerHTML = "<div class='empty-note'>Memuat data...</div>";
+  try{
+    const list = await window.storage.list("results:", true);
+    if(!list || !list.keys || list.keys.length===0){
+      wrap.innerHTML = "<div class='empty-note'>Belum ada siswa yang mengumpulkan kuis.</div>";
+      lastResults = [];
+      return;
+    }
+    const results = [];
+    for(const k of list.keys){
+      try{
+        const item = await window.storage.get(k, true);
+        if(item) results.push(JSON.parse(item.value));
+      }catch(e){}
+    }
+    lastResults = results;
+    let html = "<table><thead><tr><th>Nama</th><th>Kelas</th><th>Skor</th><th>Benar</th><th>Salah</th><th>Waktu mulai</th><th>Durasi</th></tr></thead><tbody>";
+    results.forEach(r=>{
+      html += "<tr><td>"+r.nama+"</td><td>"+r.kelas+"</td><td>"+r.skor+"</td><td>"+r.benar+"</td><td>"+r.salah+"</td><td>"+r.waktuMulai+"</td><td>"+r.durasi+"</td></tr>";
+    });
+    html += "</tbody></table>";
+    wrap.innerHTML = html;
+  }catch(e){
+    wrap.innerHTML = "<div class='empty-note'>Gagal memuat data.</div>";
+  }
+}
+document.getElementById("btnRefreshData").addEventListener("click", loadTeacherData);
+document.getElementById("btnExportExcel").addEventListener("click", ()=>{
+  if(!lastResults || lastResults.length===0){
+    alert("Belum ada data untuk diekspor.");
+    return;
+  }
+  const rows = lastResults.map((r,i)=>({
+    "No": i+1,
+    "Nama Siswa": r.nama,
+    "Kelas": r.kelas,
+    "Skor": r.skor,
+    "Jumlah Benar": r.benar,
+    "Jumlah Salah": r.salah,
+    "Waktu Mulai": r.waktuMulai,
+    "Durasi Pengerjaan": r.durasi
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Rekap Hasil Siswa");
+  XLSX.writeFile(wb, "Rekap_Hasil_Kuis_Meristem_Palisade.xlsx");
+});
+
+updateTopbar();
+</script>
+</body>
+</html>
